@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import Logo from '@/components/Logo'
@@ -77,9 +78,17 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-1 flex-wrap bg-paper">
       <div className="flex flex-[1_1_380px] flex-col justify-between gap-9 bg-navy-deep p-[clamp(20px,5vw,56px)] text-paper">
-        <div className="flex items-center gap-3">
-          <Logo size={64} />
-          <span className="font-display text-[22px] font-black uppercase tracking-[.06em]">Court Call</span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Logo size={64} />
+            <span className="font-display text-[22px] font-black uppercase tracking-[.06em]">Court Call</span>
+          </div>
+          <Link
+            href="/"
+            className="cc-focus-on-dark flex min-h-11 items-center rounded-[10px] border border-paper/25 px-3.5 text-[14px] font-semibold text-paper no-underline hover:bg-paper/[.06]"
+          >
+            ← Back
+          </Link>
         </div>
         <div className="flex flex-col gap-4">
           <div className="font-display text-[15px] font-bold uppercase tracking-[.14em] text-yellow">
@@ -135,6 +144,12 @@ export default function LoginPage() {
           <button type="submit" disabled={submitting} className="cc-btn-primary mt-1.5 text-[22px]">
             {submitting ? 'Signing in…' : 'Sign in →'}
           </button>
+          <Link
+            href="/join"
+            className="cc-focus flex min-h-11 items-center justify-center self-center rounded-md px-3 text-[14px] text-muted underline underline-offset-[3px] hover:text-navy"
+          >
+            Here to play? Check in as a guest
+          </Link>
         </form>
       </div>
     </div>
