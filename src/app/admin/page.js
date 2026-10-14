@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
 import { useAdmin } from '@/lib/adminContext'
-
-const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+import ActivityCard from '@/components/ActivityCard'
 
 const STATUS_BADGE = {
   draft: 'border-[1.5px] border-muted text-muted',
@@ -16,18 +14,9 @@ const STATUS_BADGE = {
   cancelled: 'border-[1.5px] border-muted text-muted',
 }
 
-const PAYMENT_LABEL = { upfront: 'Pay upfront', deferred: 'Pay later' }
-
-const rupiah = (v) => (Number(v) > 0 ? 'Rp ' + Number(v).toLocaleString('id-ID') : 'Free')
-
-function ActivityCard({ activity, onPublished }) {
+function AdminActivityCard({ activity, onPublished }) {
   const [publishing, setPublishing] = useState(false)
   const [publishError, setPublishError] = useState('')
-  const start = new Date(activity.start_time)
-  const time = start.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).replace('.', ':')
-  const courts = activity.planned_courts
-    ? `${activity.planned_courts} ${activity.planned_courts === 1 ? 'court' : 'courts'} · `
-    : ''
 
   async function publish() {
     setPublishing(true)
@@ -55,57 +44,38 @@ function ActivityCard({ activity, onPublished }) {
   }
 
   return (
-    <li className="flex overflow-hidden rounded-2xl border border-line bg-surface">
-      <div className="flex w-[84px] shrink-0 flex-col items-center justify-center gap-0.5 bg-navy py-4 text-paper">
-        <div className="font-display text-[15px] font-extrabold tracking-[.14em] text-yellow">{DOW[start.getDay()]}</div>
-        <div className="font-display text-[54px] font-black leading-[.88] tabular-nums">
-          {String(start.getDate()).padStart(2, '0')}
-        </div>
-        <div className="font-display text-[15px] font-extrabold tracking-[.14em] text-yellow">
-          {MON[start.getMonth()]}
-        </div>
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-3 px-[18px] py-4">
-        <div className="flex items-start justify-between gap-2.5">
-          <div className="break-words font-display text-[27px] font-black uppercase leading-[.95]">{activity.name}</div>
-          <span
-            className={`shrink-0 rounded-full px-2.5 py-1 font-display text-[13px] font-extrabold uppercase tracking-[.1em] ${
-              STATUS_BADGE[activity.status] || STATUS_BADGE.draft
-            }`}
+    <ActivityCard
+      activity={activity}
+      badge={
+        <span
+          className={`shrink-0 rounded-full px-2.5 py-1 font-display text-[13px] font-extrabold uppercase tracking-[.1em] ${
+            STATUS_BADGE[activity.status] || STATUS_BADGE.draft
+          }`}
+        >
+          {activity.status}
+        </span>
+      }
+      action={
+        activity.status === 'draft' ? (
+          <button
+            type="button"
+            onClick={publish}
+            disabled={publishing}
+            aria-describedby={publishError ? `publish-error-${activity.id}` : undefined}
+            className="cc-btn-primary min-h-11 rounded-[10px] px-[18px] text-[18px]"
           >
-            {activity.status}
-          </span>
-        </div>
-        <div className="text-[14px] leading-normal text-muted">
-          {time} · {activity.location}
-          <br />
-          {courts}
-          {activity.max_participants} spots
-        </div>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2.5">
-          <div>
-            <div className="font-display text-[23px] font-black leading-none">{rupiah(activity.fee_amount)}</div>
-            <div className="mt-[3px] text-[12px] text-muted">{PAYMENT_LABEL[activity.payment_mode]}</div>
-          </div>
-          {activity.status === 'draft' ? (
-            <button
-              type="button"
-              onClick={publish}
-              disabled={publishing}
-              aria-describedby={publishError ? `publish-error-${activity.id}` : undefined}
-              className="cc-btn-primary min-h-11 rounded-[10px] px-[18px] text-[18px]"
-            >
-              {publishing ? 'Publishing…' : 'Publish'}
-            </button>
-          ) : null}
-        </div>
-        {publishError ? (
+            {publishing ? 'Publishing…' : 'Publish'}
+          </button>
+        ) : null
+      }
+      footer={
+        publishError ? (
           <div id={`publish-error-${activity.id}`} role="alert" className="cc-field-error">
             {publishError}
           </div>
-        ) : null}
-      </div>
-    </li>
+        ) : null
+      }
+    />
   )
 }
 
@@ -170,10 +140,7 @@ export default function AdminDashboard() {
         </div>
 
         {loadError ? (
-          <div
-            role="alert"
-            className="rounded-[10px] border-[1.5px] border-danger bg-surface px-3.5 py-3 text-[14px] font-medium leading-snug text-danger"
-          >
+          <div role="alert" className="cc-alert">
             {loadError}
           </div>
         ) : activities === null ? (
@@ -181,14 +148,14 @@ export default function AdminDashboard() {
             Loading activities…
           </div>
         ) : activities.length === 0 ? (
-          <div className="rounded-2xl border-[1.5px] border-dashed border-[#AAB6C6] bg-surface px-5 py-[18px]">
-            <div className="font-display text-[26px] font-extrabold uppercase leading-none">No activities yet</div>
+          <div className="cc-empty">
+            <div className="cc-empty-title">No activities yet</div>
             <div className="mt-1 text-[15px] text-muted">Create the first one and it will show up here.</div>
           </div>
         ) : (
           <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(100%,370px),1fr))] gap-4 p-0">
             {activities.map((a) => (
-              <ActivityCard
+              <AdminActivityCard
                 key={a.id}
                 activity={a}
                 onPublished={(row) =>
