@@ -3,6 +3,7 @@
 
 export const DEVICE_TOKEN_KEY = 'courtcall_device_token'
 export const GUEST_ID_KEY = 'courtcall_guest_id'
+export const BOOKINGS_KEY = 'courtcall_bookings'
 
 export function readStorage(key) {
   try {

@@ -18,6 +18,12 @@ export function initials(name, fallback = '?') {
 export default function AppShell({ navLabel, nav, user, action, children }) {
   const pathname = usePathname()
   const showTabBar = nav.length > 1
+  // The most specific nav item containing the current page, so /activities/x
+  // still highlights Activities but /admin/activities/new doesn't also light /admin.
+  const activeHref = nav
+    .map((item) => item.href)
+    .filter((href) => pathname === href || pathname.startsWith(href + '/'))
+    .sort((a, b) => b.length - a.length)[0]
   const actionText = action.busy ? action.busyLabel : action.label
 
   return (
@@ -35,7 +41,7 @@ export default function AppShell({ navLabel, nav, user, action, children }) {
 
           <nav aria-label={navLabel} className="flex flex-col gap-1">
             {nav.map((item) => {
-              const on = pathname === item.href
+              const on = item.href === activeHref
               return (
                 <Link
                   key={item.href}
@@ -113,7 +119,7 @@ export default function AppShell({ navLabel, nav, user, action, children }) {
           className="fixed inset-x-0 bottom-0 z-30 flex gap-0.5 border-t border-paper/10 bg-navy-deep px-1.5 pb-[calc(4px+env(safe-area-inset-bottom))] pt-1 min-[880px]:hidden"
         >
           {nav.map((item) => {
-            const on = pathname === item.href
+            const on = item.href === activeHref
             return (
               <Link
                 key={item.href}
