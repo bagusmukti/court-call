@@ -22,6 +22,9 @@ function validate(form) {
 
   if (!form.start_time) errors.start_time = 'Pick the date and time the session starts.'
   else if (Number.isNaN(new Date(form.start_time).getTime())) errors.start_time = 'That date and time isn’t valid.'
+  // datetime-local has minute precision, so the current minute still counts as "now".
+  else if (new Date(form.start_time).getTime() < new Date().setSeconds(0, 0))
+    errors.start_time = 'Start time can’t be in the past.'
 
   if (!form.location.trim()) errors.location = 'Say where the session is held.'
 
