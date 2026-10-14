@@ -56,17 +56,26 @@ function AdminActivityCard({ activity, onPublished }) {
         </span>
       }
       action={
-        activity.status === 'draft' ? (
-          <button
-            type="button"
-            onClick={publish}
-            disabled={publishing}
-            aria-describedby={publishError ? `publish-error-${activity.id}` : undefined}
-            className="cc-btn-primary min-h-11 rounded-[10px] px-[18px] text-[18px]"
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/admin/activities/${activity.id}`}
+            aria-label={`Manage ${activity.name}`}
+            className="cc-focus inline-flex min-h-11 items-center rounded-[10px] border-[1.5px] border-navy px-4 font-display text-[17px] font-extrabold uppercase tracking-[.05em] text-navy no-underline hover:bg-navy hover:text-paper"
           >
-            {publishing ? 'Publishing…' : 'Publish'}
-          </button>
-        ) : null
+            Manage
+          </Link>
+          {activity.status === 'draft' ? (
+            <button
+              type="button"
+              onClick={publish}
+              disabled={publishing}
+              aria-describedby={publishError ? `publish-error-${activity.id}` : undefined}
+              className="cc-btn-primary min-h-11 rounded-[10px] px-[18px] text-[18px]"
+            >
+              {publishing ? 'Publishing…' : 'Publish'}
+            </button>
+          ) : null}
+        </div>
       }
       footer={
         publishError ? (
