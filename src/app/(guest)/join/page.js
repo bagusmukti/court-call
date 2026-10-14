@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
-import { firstGuestRow, useGuest } from '@/lib/guestContext'
+import { firstRow, useGuest } from '@/lib/guestContext'
 import { DEVICE_TOKEN_KEY, GUEST_ID_KEY, readStorage, writeStorage } from '@/lib/deviceStorage'
 import Logo from '@/components/Logo'
 import Field, { fieldProps } from '@/components/Field'
@@ -75,7 +75,7 @@ export default function JoinPage() {
         setSubmitting(false)
         return
       }
-      const profile = firstGuestRow(data)
+      const profile = firstRow(data)
       if (!profile) {
         setFormError('Couldn’t check you in — the server didn’t return your profile. Try again in a moment.')
         setSubmitting(false)

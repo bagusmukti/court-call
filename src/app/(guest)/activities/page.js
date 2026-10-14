@@ -5,8 +5,14 @@ import { supabase } from '@/lib/supabaseClient'
 import { useGuest } from '@/lib/guestContext'
 import ActivityCard from '@/components/ActivityCard'
 
+const bookedBadge = (
+  <span className="shrink-0 rounded-full bg-[#FBE7A6] px-2.5 py-1 font-display text-[13px] font-extrabold tracking-[.1em] text-navy-deep">
+    BOOKED ✓
+  </span>
+)
+
 export default function ActivitiesPage() {
-  const { guest } = useGuest()
+  const { guest, bookings, loadBookings } = useGuest()
   const [activities, setActivities] = useState(null)
   const [loadError, setLoadError] = useState('')
 
@@ -28,10 +34,10 @@ export default function ActivitiesPage() {
     }
   }, [])
 
-  // Booking is the next screen; for now a tap just identifies the activity.
-  function selectActivity(activity) {
-    console.log('Selected activity', activity.id)
-  }
+  // Re-check bookings with Supabase whenever this page opens.
+  useEffect(() => {
+    loadBookings()
+  }, [loadBookings])
 
   const firstName = guest.name.trim().split(/\s+/)[0]
 
@@ -62,7 +68,12 @@ export default function ActivitiesPage() {
       ) : (
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(100%,370px),1fr))] gap-4 p-0">
           {activities.map((a) => (
-            <ActivityCard key={a.id} activity={a} onSelect={selectActivity} />
+            <ActivityCard
+              key={a.id}
+              activity={a}
+              href={`/activities/${a.id}`}
+              badge={bookings[a.id] ? bookedBadge : null}
+            />
           ))}
         </ul>
       )}

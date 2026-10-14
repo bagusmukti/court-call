@@ -1,23 +1,15 @@
-const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-
-const PAYMENT_LABEL = { upfront: 'Pay upfront', deferred: 'Pay later' }
-
-const rupiah = (v) => (Number(v) > 0 ? 'Rp ' + Number(v).toLocaleString('id-ID') : 'Free')
+import Link from 'next/link'
+import { DOW, MON, PAYMENT_LABEL, clockTime, courtsLabel, rupiah } from '@/lib/format'
 
 const CARD = 'flex w-full overflow-hidden rounded-2xl border border-line bg-surface text-left'
 
 // The design's Activities card. `badge` sits beside the title, `action` beside
-// the fee, `footer` under everything. Pass `onSelect` to make the whole card
-// one button — only when it has no other controls inside.
-export default function ActivityCard({ activity, badge, action, footer, onSelect }) {
+// the fee, `footer` under everything. Pass `href` to make the whole card one
+// link — only when it has no other controls inside.
+export default function ActivityCard({ activity, badge, action, footer, href }) {
   const start = new Date(activity.start_time)
-  const time = start
-    .toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })
-    .replace('.', ':')
-  const courts = activity.planned_courts
-    ? `${activity.planned_courts} ${activity.planned_courts === 1 ? 'court' : 'courts'} · `
-    : ''
+  const time = clockTime(start)
+  const courts = activity.planned_courts ? `${courtsLabel(activity.planned_courts)} · ` : ''
 
   const body = (
     <>
@@ -55,14 +47,10 @@ export default function ActivityCard({ activity, badge, action, footer, onSelect
 
   return (
     <li className="flex">
-      {onSelect ? (
-        <button
-          type="button"
-          onClick={() => onSelect(activity)}
-          className={`${CARD} cc-focus cursor-pointer p-0 font-[inherit] text-ink transition-colors hover:border-navy`}
-        >
+      {href ? (
+        <Link href={href} className={`${CARD} cc-focus text-ink no-underline transition-colors hover:border-navy`}>
           {body}
-        </button>
+        </Link>
       ) : (
         <div className={CARD}>{body}</div>
       )}
