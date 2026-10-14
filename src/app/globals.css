@@ -114,6 +114,34 @@ body {
     color: var(--color-danger);
   }
 
+  .cc-alert {
+    padding: 12px 14px;
+    border: 1.5px solid var(--color-danger);
+    border-radius: 10px;
+    background: var(--color-surface);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.375;
+    color: var(--color-danger);
+  }
+
+  /* Dashed "nothing here yet" panel from the design's live board. */
+  .cc-empty {
+    padding: 18px 20px;
+    border: 1.5px dashed #aab6c6;
+    border-radius: 16px;
+    background: var(--color-surface);
+  }
+
+  .cc-empty-title {
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 72;
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
   /* Yellow is the one primary action per screen; its text is always navy. */
   .cc-btn-primary {
     display: inline-flex;
