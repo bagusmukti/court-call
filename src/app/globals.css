@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Court Call v3 design tokens — keep in sync with the design file. */
+@theme {
+  --color-navy: #16398c;
+  --color-navy-deep: #0a1e4f;
+  --color-yellow: #f2b705;
+  --color-yellow-hover: #ffc72c;
+  --color-paper: #f4f5f7;
+  --color-surface: #fcfcfd;
+  --color-ink: #0f1e33;
+  --color-ink-soft: #3a4a62;
+  --color-muted: #56657a;
+  --color-line: #d5dae2;
+  --color-line-soft: #e4e8ee;
+  --color-field: #c3cad5;
+  --color-placeholder: #919cad;
+  --color-disabled: #7b889a;
+  --color-danger: #b8361a;
+  --color-amber: #8a5a00;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+  --font-display: var(--font-big-shoulders), sans-serif;
+  --font-display--font-variation-settings: "opsz" 72;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--color-paper);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* In the base layer so colour utilities on links still win. */
+@layer base {
+  a {
+    color: var(--color-navy);
+  }
+}
+
+@layer components {
+  /* Small tracked label that sits above a page or sheet title. */
+  .cc-eyebrow {
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 72;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-navy);
+  }
+
+  .cc-page-title {
+    margin: 6px 0 0;
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 72;
+    font-weight: 900;
+    font-size: clamp(46px, 6vw, 78px);
+    line-height: 0.86;
+    text-transform: uppercase;
+  }
+
+  .cc-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ink-soft);
+  }
+
+  .cc-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 12px;
+    border: 1.5px solid var(--color-field);
+    border-radius: 10px;
+    background: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--color-ink);
+    outline: none;
+  }
+
+  .cc-input::placeholder {
+    color: var(--color-placeholder);
+  }
+
+  .cc-input:focus {
+    border-color: var(--color-navy);
+    box-shadow: 0 0 0 3px rgba(22, 57, 140, 0.15);
+  }
+
+  .cc-input[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
+
+  .cc-input:disabled {
+    background: var(--color-line-soft);
+    color: var(--color-disabled);
+  }
+
+  .cc-input-lg {
+    height: 52px;
+    padding: 0 14px;
+  }
+
+  .cc-field-error {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-danger);
+  }
+
+  /* Yellow is the one primary action per screen; its text is always navy. */
+  .cc-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+    padding: 0 22px;
+    border: none;
+    border-radius: 12px;
+    background: var(--color-yellow);
+    color: var(--color-navy-deep);
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 72;
+    font-weight: 800;
+    font-size: 21px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .cc-btn-primary:hover {
+    background: var(--color-yellow-hover);
+  }
+
+  .cc-btn-primary:disabled {
+    background: var(--color-line-soft);
+    color: var(--color-disabled);
+    cursor: not-allowed;
+  }
+
+  .cc-btn-primary:focus-visible,
+  .cc-focus:focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 3px;
+  }
+
+  .cc-focus-on-dark:focus-visible {
+    outline: 3px solid var(--color-yellow);
+    outline-offset: 2px;
+  }
+
+  .cc-spinner {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid var(--color-line);
+    border-top-color: var(--color-navy);
+    animation: cc-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes cc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-spinner {
+    animation-duration: 2.4s;
+  }
 }
