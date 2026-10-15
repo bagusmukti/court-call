@@ -220,6 +220,44 @@ body {
   }
 }
 
+/* "You're up" announcement: rings spreading from the centre and a pulsing court pill. */
+.cc-call-ring {
+  position: absolute;
+  left: -60vmax;
+  top: -60vmax;
+  width: 120vmax;
+  height: 120vmax;
+  border-radius: 50%;
+  border: 3px solid rgba(10, 30, 79, 0.22);
+  transform: scale(0);
+  animation: cc-ring 3s ease-out infinite;
+}
+
+.cc-call-pulse {
+  animation: cc-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cc-ring {
+  0% {
+    transform: scale(0.06);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes cc-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
 @keyframes cc-ping {
   0% {
     transform: scale(0.6);
@@ -236,7 +274,12 @@ body {
     animation-duration: 2.4s;
   }
 
-  .cc-live-dot::after {
+  .cc-live-dot::after,
+  .cc-call-pulse {
     animation: none;
+  }
+
+  .cc-call-ring {
+    display: none;
   }
 }
