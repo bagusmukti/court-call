@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { useGuest } from '@/lib/guestContext'
 import { useActivity } from '@/lib/useActivity'
-import { MAX_PROOF_BYTES, PROOF_BUCKET, QRIS_ALT, QRIS_IMAGE, needsPayment, proofPath } from '@/lib/payment'
+import { MAX_PROOF_BYTES, PROOF_BUCKET, needsPayment, proofPath } from '@/lib/payment'
+import { useClubSettings } from '@/lib/useClubSettings'
+import QrisCode from '@/components/QrisCode'
 import { rupiah } from '@/lib/format'
 import BackLink from '@/components/BackLink'
 import PaymentStatus from '@/components/PaymentStatus'
@@ -24,6 +25,7 @@ export default function PayPage() {
   const { id } = useParams()
   const { guest, bookings, bookingsReady, loadBookings, saveBooking } = useGuest()
   const { activity, error: loadError } = useActivity(id)
+  const club = useClubSettings()
   const inputRef = useRef(null)
 
   const [file, setFile] = useState(null)
@@ -188,17 +190,16 @@ export default function PayPage() {
           <div className="text-[14px] text-muted">
             {activity.name} · queue <span className="font-bold text-ink">#{saved.queue_position}</span>
           </div>
-          <div className="rounded-[14px] border border-line bg-white p-4">
-            <Image
-              src={QRIS_IMAGE}
-              alt={QRIS_ALT}
-              priority
-              className="block h-auto w-[min(220px,58vw)]"
-            />
-          </div>
-          <p className="m-0 max-w-[340px] text-[14px] font-semibold leading-snug text-amber">
-            This QR code doesn’t fill in the amount — type exactly {amount} in your app.
-          </p>
+          <QrisCode
+            url={club.settings?.qris_image_url}
+            loading={club.loading}
+            emptyText="The club’s QR code hasn’t been set up yet — ask the admin desk how to pay."
+          />
+          {club.settings?.qris_image_url ? (
+            <p className="m-0 max-w-[340px] text-[14px] font-semibold leading-snug text-amber">
+              This QR code doesn’t fill in the amount — type exactly {amount} in your app.
+            </p>
+          ) : null}
         </div>
 
         <ol className="m-0 list-decimal pl-5 text-[14px] leading-[1.65] text-ink-soft">
