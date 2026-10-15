@@ -10,6 +10,7 @@ import PageStatus from '@/components/PageStatus'
 const NAV = [
   { href: '/admin', label: 'Dashboard', short: 'Dashboard' },
   { href: '/admin/activities/new', label: 'Create activity', short: 'New activity' },
+  { href: '/admin/leaderboard', label: 'Leaderboard', short: 'Ranks' },
 ]
 
 export default function AdminLayout({ children }) {
