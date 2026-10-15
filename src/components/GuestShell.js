@@ -23,13 +23,17 @@ export default function GuestShell({ children }) {
 
   if (!guest) return <PageStatus>Loading…</PageStatus>
 
+  // Status comes from the profile the guest RPCs return, so an admin's change
+  // shows on the guest's next page load.
+  const role = guest.is_committee ? 'Committee' : guest.is_member ? 'Member' : 'Guest'
+
   return (
     <AppShell
       navLabel="Guest"
       nav={NAV}
       user={{
         name: guest.name,
-        sub: guest.nrp ? `Guest · NRP ${guest.nrp}` : 'Guest',
+        sub: guest.nrp ? `${role} · NRP ${guest.nrp}` : role,
         initials: initials(guest.name),
       }}
       action={{ label: 'Not you?', onClick: forgetDevice }}
