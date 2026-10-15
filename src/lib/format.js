@@ -3,7 +3,11 @@ export const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP
 
 export const PAYMENT_LABEL = { upfront: 'Pay upfront', deferred: 'Pay later' }
 
+// A fee: "Free" when there's nothing to pay.
 export const rupiah = (v) => (Number(v) > 0 ? 'Rp ' + Number(v).toLocaleString('id-ID') : 'Free')
+
+// An amount of money, always as a number: "Rp 150.000", "Rp 0".
+export const idr = (v) => 'Rp ' + Number(v || 0).toLocaleString('id-ID')
 
 // 24-hour "19:00" in the viewer's time zone.
 export const clockTime = (date) =>

@@ -8,8 +8,10 @@ import AppShell, { initials } from '@/components/AppShell'
 import PageStatus from '@/components/PageStatus'
 
 const NAV = [
-  { href: '/admin', label: 'Dashboard', short: 'Dashboard' },
-  { href: '/admin/activities/new', label: 'Create activity', short: 'New activity' },
+  { href: '/admin', label: 'Dashboard', short: 'Home' },
+  { href: '/admin/activities/new', label: 'Create activity', short: 'New' },
+  { href: '/admin/history', label: 'Activity history', short: 'History' },
+  { href: '/admin/members', label: 'Members', short: 'Members' },
   { href: '/admin/leaderboard', label: 'Leaderboard', short: 'Ranks' },
 ]
 
