@@ -15,6 +15,7 @@ import DetailRow from '@/components/DetailRow'
 import PaymentBadge from '@/components/PaymentBadge'
 import CourtsSection from './CourtsSection'
 import QueueSection from './QueueSection'
+import CommitteeSection from './CommitteeSection'
 import { useMatchHistory } from '@/lib/useMatchHistory'
 import MatchHistoryList from '@/components/MatchHistoryList'
 
@@ -381,6 +382,8 @@ export default function ManageActivityPage() {
         courtOf={courtOf}
         onChanged={() => setVersion((v) => v + 1)}
       />
+
+      <CommitteeSection activityId={id} />
 
       <section aria-labelledby="history-heading" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
