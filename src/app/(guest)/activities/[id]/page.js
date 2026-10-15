@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { firstRow, useGuest } from '@/lib/guestContext'
@@ -124,9 +125,19 @@ export default function ActivityDetailPage() {
   return (
     <div className="flex flex-col gap-[22px]">
       <BackLink />
-      <div>
-        <div className="cc-eyebrow">{longDate(start)}</div>
-        <h1 className="cc-page-title break-words">{activity.name}</h1>
+      <div className="flex flex-wrap items-end justify-between gap-x-5 gap-y-3">
+        <div className="min-w-0">
+          <div className="cc-eyebrow">{longDate(start)}</div>
+          <h1 className="cc-page-title break-words">{activity.name}</h1>
+        </div>
+        <Link
+          href={`/activities/${id}/live`}
+          className="cc-focus inline-flex min-h-12 items-center gap-2.5 rounded-full bg-navy-deep px-[18px] font-display text-[17px] font-extrabold uppercase tracking-[.1em] text-paper no-underline hover:bg-navy"
+        >
+          <span className="cc-live-dot" aria-hidden="true" />
+          Live queue
+          <span aria-hidden="true">→</span>
+        </Link>
       </div>
 
       <div className="grid items-start gap-5 min-[1100px]:grid-cols-[minmax(0,1fr)_440px]">

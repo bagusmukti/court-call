@@ -1,15 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { useAdmin } from '@/lib/adminContext'
 import { useActivity } from '@/lib/useActivity'
+import { useLiveRows } from '@/lib/useLiveRows'
+import { useLiveMatches } from '@/lib/useLiveMatches'
+import { useUserNames } from '@/lib/useNames'
 import { PROOF_BUCKET } from '@/lib/payment'
 import { PAYMENT_LABEL, clockTime, courtsLabel, humanize, longDate, rupiah } from '@/lib/format'
 import BackLink from '@/components/BackLink'
 import DetailRow from '@/components/DetailRow'
 import PaymentBadge from '@/components/PaymentBadge'
+import CourtsSection from './CourtsSection'
+import QueueSection from './QueueSection'
 
 const BTN = 'cc-focus inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[10px] px-4 text-[14px] font-semibold disabled:cursor-wait disabled:opacity-60'
 const BTN_NAVY = `${BTN} border-none bg-navy text-paper hover:bg-navy-deep`
@@ -233,6 +238,39 @@ export default function ManageActivityPage() {
   const [listError, setListError] = useState('')
   const [version, setVersion] = useState(0)
 
+  // Live data shared by the Courts and Queue sections.
+  const bookingsLive = useLiveRows('bookings', id)
+  const courtsLive = useLiveRows('courts', id)
+  const matches = useLiveMatches(id)
+  const queue = useMemo(
+    () =>
+      (bookingsLive.rows || [])
+        .filter((b) => b.booking_status !== 'cancelled')
+        .sort((a, b) => (a.queue_position ?? Infinity) - (b.queue_position ?? Infinity)),
+    [bookingsLive.rows]
+  )
+  const names = useUserNames([...queue.map((b) => b.user_id), ...matches.playingIds])
+  const courtOf = useMemo(() => {
+    const out = {}
+    for (const c of courtsLive.rows || []) {
+      const m = matches.byCourt[c.id]
+      if (m) for (const uid of [...m.a, ...m.b]) out[uid] = c.name
+    }
+    return out
+  }, [courtsLive.rows, matches.byCourt])
+
+  // After any write: refresh the payments list, and re-fetch live data in case
+  // Realtime is slow or disconnected.
+  const { reload: reloadBookings } = bookingsLive
+  const { reload: reloadCourts } = courtsLive
+  const { reload: reloadMatches } = matches
+  const refreshAll = () => {
+    setVersion((v) => v + 1)
+    reloadBookings()
+    reloadCourts()
+    reloadMatches()
+  }
+
   useEffect(() => {
     let active = true
     async function load() {
@@ -322,6 +360,24 @@ export default function ManageActivityPage() {
           {rupiah(activity.fee_amount)} · {PAYMENT_LABEL[activity.payment_mode]}
         </DetailRow>
       </dl>
+
+      <CourtsSection
+        activityId={id}
+        courtsLive={courtsLive}
+        matches={matches}
+        queue={queue}
+        names={names}
+        onChanged={refreshAll}
+      />
+
+      <QueueSection
+        activityId={id}
+        adminId={admin.id}
+        bookingsLive={bookingsLive}
+        names={names}
+        courtOf={courtOf}
+        onChanged={() => setVersion((v) => v + 1)}
+      />
 
       <section aria-labelledby="participants-heading" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
