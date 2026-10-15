@@ -13,6 +13,7 @@ const NAV = [
   { href: '/admin/history', label: 'Activity history', short: 'History' },
   { href: '/admin/members', label: 'Members', short: 'Members' },
   { href: '/admin/leaderboard', label: 'Leaderboard', short: 'Ranks' },
+  { href: '/admin/settings', label: 'Payment settings', short: 'QRIS' },
 ]
 
 export default function AdminLayout({ children }) {
