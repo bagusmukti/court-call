@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import CourtStatusBadge from '@/components/CourtStatusBadge'
+import ResultModal from './ResultModal'
 
 const PER_TEAM = { singles: 1, doubles: 2 }
 
@@ -10,7 +11,6 @@ const BTN = 'cc-focus inline-flex min-h-10 cursor-pointer items-center justify-c
 const BTN_NAVY = `${BTN} border-none bg-navy text-paper hover:bg-navy-deep`
 const BTN_OUTLINE = `${BTN} border-[1.5px] border-navy bg-transparent text-navy hover:bg-navy hover:text-paper`
 const BTN_QUIET = `${BTN} border-none bg-transparent text-muted hover:text-ink`
-const BTN_DANGER = `${BTN} border-[1.5px] border-danger bg-transparent text-danger hover:bg-danger hover:text-white`
 
 const sortCourts = (rows) =>
   (rows || []).slice().sort((a, b) => String(a.name).localeCompare(String(b.name), undefined, { numeric: true }))
@@ -178,29 +178,10 @@ function StartMatchForm({ court, activityId, queue, playingIds, nameOf, onDone, 
 
 function CourtRow({ court, activityId, queue, matches, nameOf, onChanged }) {
   const [starting, setStarting] = useState(false)
-  const [confirmEnd, setConfirmEnd] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
+  const [entering, setEntering] = useState(false)
 
   const current = matches.byCourt[court.id]
   const inUse = court.status === 'in_use'
-
-  async function endMatch() {
-    setBusy(true)
-    setError('')
-    try {
-      const { error: rpcError } = await supabase.rpc('end_match', { p_match_id: current.match.id })
-      if (rpcError) setError(`Couldn’t end the match: ${rpcError.message}`)
-      else {
-        setConfirmEnd(false)
-        onChanged()
-      }
-    } catch (err) {
-      setError(err?.message || 'Couldn’t reach the server. Check your connection and try again.')
-    } finally {
-      setBusy(false)
-    }
-  }
 
   const teamText = (ids) => ids.map(nameOf).join(' & ') || '—'
 
@@ -216,9 +197,9 @@ function CourtRow({ court, activityId, queue, matches, nameOf, onChanged }) {
             Start match
           </button>
         ) : null}
-        {inUse && current && !confirmEnd ? (
-          <button type="button" onClick={() => setConfirmEnd(true)} className={BTN_OUTLINE}>
-            End match
+        {inUse && current ? (
+          <button type="button" onClick={() => setEntering(true)} disabled={!current.loaded} className={BTN_NAVY}>
+            Enter result
           </button>
         ) : null}
       </div>
@@ -246,16 +227,17 @@ function CourtRow({ court, activityId, queue, matches, nameOf, onChanged }) {
         ) : null
       ) : null}
 
-      {confirmEnd && current ? (
-        <div className="flex flex-wrap items-center gap-2.5 rounded-xl bg-[#EEF1F5] px-4 py-3">
-          <span className="flex-[1_1_220px] text-[14px] font-semibold">End this match and free {court.name}?</span>
-          <button type="button" onClick={endMatch} disabled={busy} className={BTN_DANGER}>
-            {busy ? 'Ending…' : 'Yes, end match'}
-          </button>
-          <button type="button" onClick={() => setConfirmEnd(false)} disabled={busy} className={BTN_QUIET}>
-            Cancel
-          </button>
-        </div>
+      {entering && current ? (
+        <ResultModal
+          court={court}
+          match={current.match}
+          teams={{ a: teamText(current.a), b: teamText(current.b) }}
+          onClose={() => setEntering(false)}
+          onSaved={() => {
+            setEntering(false)
+            onChanged()
+          }}
+        />
       ) : null}
 
       {starting && court.status === 'idle' ? (
@@ -273,17 +255,12 @@ function CourtRow({ court, activityId, queue, matches, nameOf, onChanged }) {
         />
       ) : null}
 
-      {error ? (
-        <div role="alert" className="cc-alert">
-          {error}
-        </div>
-      ) : null}
     </li>
   )
 }
 
-// Courts for one activity: add courts, start a match on an idle court, end one
-// on an in-use court.
+// Courts for one activity: add courts, start a match on an idle court, and
+// enter the result of one in use (which frees the court).
 //   courtsLive: useLiveRows('courts', …)   matches: useLiveMatches(…)
 //   queue: active bookings in queue order   names: useUserNames(…)
 export default function CourtsSection({ activityId, courtsLive, matches, queue, names, onChanged }) {

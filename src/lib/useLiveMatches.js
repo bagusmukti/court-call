@@ -12,7 +12,9 @@ const teamOf = (value) => (String(value || '').toLowerCase().endsWith('b') ? 'b'
 // Live matches for an activity and who's playing in each active one.
 //   byCourt:   { [courtId]: { match, a: [userId], b: [userId] } } — active matches only
 //   playingIds: Set of user ids currently on a court
-//   reload():  re-fetch matches (e.g. after start_match / end_match)
+//   versionKey: changes whenever a match is added or changes status — a
+//               refreshKey for anything derived from matches (history, records)
+//   reload():  re-fetch matches (e.g. after start_match / submit_match_result)
 //
 // match_participants has no activity_id to filter Realtime on, but start_match
 // writes them in the same transaction as the match, so they're fetched when a
@@ -68,5 +70,10 @@ export function useLiveMatches(activityId) {
     return ids
   }, [byCourt])
 
-  return { byCourt, playingIds, error, live, ready: matches !== null, reload }
+  const versionKey = (matches || [])
+    .map((m) => `${m.id}:${m.status}`)
+    .sort()
+    .join(',')
+
+  return { byCourt, playingIds, versionKey, error, live, ready: matches !== null, reload }
 }

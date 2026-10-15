@@ -15,6 +15,8 @@ import DetailRow from '@/components/DetailRow'
 import PaymentBadge from '@/components/PaymentBadge'
 import CourtsSection from './CourtsSection'
 import QueueSection from './QueueSection'
+import { useMatchHistory } from '@/lib/useMatchHistory'
+import MatchHistoryList from '@/components/MatchHistoryList'
 
 const BTN = 'cc-focus inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[10px] px-4 text-[14px] font-semibold disabled:cursor-wait disabled:opacity-60'
 const BTN_NAVY = `${BTN} border-none bg-navy text-paper hover:bg-navy-deep`
@@ -249,6 +251,7 @@ export default function ManageActivityPage() {
         .sort((a, b) => (a.queue_position ?? Infinity) - (b.queue_position ?? Infinity)),
     [bookingsLive.rows]
   )
+  const history = useMatchHistory(id, matches.versionKey)
   const names = useUserNames([...queue.map((b) => b.user_id), ...matches.playingIds])
   const courtOf = useMemo(() => {
     const out = {}
@@ -378,6 +381,28 @@ export default function ManageActivityPage() {
         courtOf={courtOf}
         onChanged={() => setVersion((v) => v + 1)}
       />
+
+      <section aria-labelledby="history-heading" className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+          <h2 id="history-heading" className="m-0 font-display text-[34px] font-black uppercase leading-none">
+            Match history
+          </h2>
+          {history.rows?.length ? (
+            <div className="text-[14px] text-muted">{history.rows.length} {history.rows.length === 1 ? 'match' : 'matches'} · newest first</div>
+          ) : null}
+        </div>
+        {history.error ? (
+          <div role="alert" className="cc-alert">
+            {history.error}
+          </div>
+        ) : history.rows === null ? (
+          <div role="status" className="text-[14px] text-muted">
+            Loading match history…
+          </div>
+        ) : (
+          <MatchHistoryList rows={history.rows} emptyText="Start a match on a court — finished games and their results show up here." />
+        )}
+      </section>
 
       <section aria-labelledby="participants-heading" className="flex flex-col gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
