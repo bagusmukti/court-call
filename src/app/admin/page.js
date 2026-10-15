@@ -5,14 +5,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
 import { useAdmin } from '@/lib/adminContext'
 import ActivityCard from '@/components/ActivityCard'
-
-const STATUS_BADGE = {
-  draft: 'border-[1.5px] border-muted text-muted',
-  published: 'bg-[#FBE7A6] text-navy-deep',
-  ongoing: 'bg-navy-deep text-paper',
-  completed: 'border-[1.5px] border-muted text-muted',
-  cancelled: 'border-[1.5px] border-muted text-muted',
-}
+import ActivityStatusBadge from '@/components/ActivityStatusBadge'
 
 function AdminActivityCard({ activity, onPublished }) {
   const [publishing, setPublishing] = useState(false)
@@ -46,15 +39,7 @@ function AdminActivityCard({ activity, onPublished }) {
   return (
     <ActivityCard
       activity={activity}
-      badge={
-        <span
-          className={`shrink-0 rounded-full px-2.5 py-1 font-display text-[13px] font-extrabold uppercase tracking-[.1em] ${
-            STATUS_BADGE[activity.status] || STATUS_BADGE.draft
-          }`}
-        >
-          {activity.status}
-        </span>
-      }
+      badge={<ActivityStatusBadge status={activity.status} />}
       action={
         <div className="flex flex-wrap gap-2">
           <Link
