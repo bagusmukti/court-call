@@ -10,6 +10,9 @@ import { useQueueNames } from '@/lib/useNames'
 import { clockTime, humanize, longDate } from '@/lib/format'
 import BackLink from '@/components/BackLink'
 import CourtCard from '@/components/CourtCard'
+import LiveTabs from '@/components/LiveTabs'
+import RecordChip from '@/components/RecordChip'
+import { useMatchRecord } from '@/lib/useMatchHistory'
 
 const GROUPS = ['Next game', 'Game after', 'Later']
 const pad = (n) => String(n ?? '–').padStart(2, '0')
@@ -22,6 +25,7 @@ export default function LiveBoardPage() {
   const courtsLive = useLiveRows('courts', id)
   const matchesLive = useLiveMatches(id)
   const { byCourt, playingIds } = matchesLive
+  const record = useMatchRecord(guest.id, matchesLive.versionKey)
 
   const active = useMemo(
     () =>
@@ -76,6 +80,7 @@ export default function LiveBoardPage() {
   return (
     <div className="flex flex-col gap-5">
       <BackLink href={`/activities/${id}`}>← Back to the session</BackLink>
+      <LiveTabs activityId={id} aside={<RecordChip record={record} />} />
 
       <div className="flex flex-wrap items-end justify-between gap-x-5 gap-y-2.5">
         <div>
